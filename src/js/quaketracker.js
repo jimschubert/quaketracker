@@ -12,7 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 QuakeTracker = function(googleMap) { 
 	if(!(this instanceof QuakeTracker)){
-		return new QuakeTracker();
+		return new QuakeTracker(googleMap);
 	}	
 	this.map = googleMap;
 	this.infowindow = null;
