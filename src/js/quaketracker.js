@@ -40,12 +40,13 @@ QuakeTracker.prototype.loadQuakes = function(feed) {
 	},
 	success: function(xml){
 			/* TODO: do we need to bind this to elements now or can we cache?  Users won't even see 90% of these */
+						
 			$(xml).find('entry').each(function(){
 				/* Retrieve all needed values from XML */
 				var entry = $(this);
-				var id = entry.find('id').text();
-				var title = entry.find('title').text();
-				self.quakes[id] = entry;
+				var title = entry.find('title').text();							
+				var summary = entry.find('summary').text();
+				var htmlString = "<div class=\"infowindow\"><b>" + title + "</b>" + "<p>" + summary + "<br></div>";
 			
 				var coord = entry.find('point').eq(0).text().split(' ');	
 				var myLatlng = new google.maps.LatLng(parseFloat(coord[0]), parseFloat(coord[1]));
@@ -54,10 +55,14 @@ QuakeTracker.prototype.loadQuakes = function(feed) {
 					 map: self.map,
 					 title: title
 				});
-				var magnitude = (parseFloat(title.split(',')[0].split(' ')[1]) * 10);
-				magnitude = magnitude - (magnitude % 10); /* round down to nearest half */
-				marker.setIcon('img/' + magnitude + '.png');
-				self.addMarker(marker, id);			
+				var magnitude = title.split(',')[0].split(' ')[1].split('.');								
+				var icon = new google.maps.MarkerImage('img/markers.png',
+				  new google.maps.Size(35,35),
+				  new google.maps.Point(35*parseInt(magnitude[1], 10), 35*parseInt(magnitude[0], 10)),
+				  new google.maps.Point(0, 13));
+				  
+				marker.setIcon(icon);
+				self.addMarker(marker, htmlString);			
 			});/*  end each */
 			$('#output').text("Showing " + self.markers.length + " earthquakes");
 		}
@@ -70,7 +75,7 @@ QuakeTracker.prototype.closeInfoWindow = function() {
 	}
 }
 
-QuakeTracker.prototype.addMarker = function(marker, quakeId){	
+QuakeTracker.prototype.addMarker = function(marker, msg){	
 	var self = this;
 	if(null == self.infowindow){
 		self.infowindow = new google.maps.InfoWindow();
@@ -80,14 +85,9 @@ QuakeTracker.prototype.addMarker = function(marker, quakeId){
 	}
 	
 	/* add listener to marker */
-	google.maps.event.addListener(marker, 'click' ,function(){
-		var id = quakeId;
-		var entry = $(self.quakes[quakeId]);				
-		var summary = entry.find('summary').text();
-		var htmlString = "<div class=\"infowindow\"><b>" + marker.title + "</b>" + "<p>" + summary + "<br></div>";
-		
+	google.maps.event.addListener(marker, 'click' ,function(){		
 		/* set balloon */
-		self.infowindow.setContent(htmlString);
+		self.infowindow.setContent(msg);
 		self.infowindow.open(self.map, marker);	
 	});
 		

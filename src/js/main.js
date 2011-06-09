@@ -45,7 +45,7 @@ $(document).ready(function(){
 	close.click(function(){	menu.hide(); btn.show(); });
 	btn.click(function(){ btn.hide(); menu.show(); });
 		
-	var selected = $('#usgs li.selected').attr('id');
-	quaketracker.loadQuakes(quaketracker.feeds[selected]);
+	var selected = $('#usgs-feeds li.selected').get(0);
+	quaketracker.loadQuakes(quaketracker.feeds[selected.id]);
 });
 	
