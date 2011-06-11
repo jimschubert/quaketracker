@@ -13,6 +13,9 @@ $(document).ready(function(){
 		btn = $('#button'),
 		close = $('#close'),
 		usgs = $('#usgs-feeds'),	
+		getFeed = function(elem) {
+			return quaketracker.feeds[elem.id]['atom'];
+		},
 		latlng = new google.maps.LatLng(35.6802, -121.1165),	
 		myOptions = {
 			zoom: 3,
@@ -32,9 +35,16 @@ $(document).ready(function(){
 	quaketracker = new QuakeTracker(googleMap);
   
   	/* setup selection list */
+	$.each(quaketracker.feeds, function(id, quake){ 
+		var item = $('<li></li>');
+		item.attr('id', id);
+		item.text(quake.description);
+		usgs.append(item);
+	});
+	
 	$('#usgs-feeds li').click(function(){
 		$('#usgs-feeds li').removeClass('selected');
-		 try{ quaketracker.loadQuakes(quaketracker.feeds[this.id]); }
+		 try{ quaketracker.loadQuakes(getFeed(this)); }
 		 catch(err){
 		 	alert('could not load selected feed');
 			/* console.error(err.message); // works in firebug,chrome */
@@ -45,7 +55,6 @@ $(document).ready(function(){
 	close.click(function(){	menu.hide(); btn.show(); });
 	btn.click(function(){ btn.hide(); menu.show(); });
 		
-	var selected = $('#usgs-feeds li.selected').get(0);
-	quaketracker.loadQuakes(quaketracker.feeds[selected.id]);
+	$('#usgs-feeds li:eq(0)').trigger('click');
 });
 	

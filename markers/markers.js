@@ -32,10 +32,10 @@ fs.readFile(baseImage, function(err,data) {
 	for(var magnitude = 0; magnitude <= 100; magnitude++) {
 		var y = 35 * Math.floor(magnitude/10),
 			x = ( 35*(magnitude % 10) );
-		if(magnitude % 10 == 0){
-			color[1] = color[1] - 25;
+		if(magnitude % 5 == 0){
+			color[1] = color[1] - 13;
 		}
-		
+				
 		ctx.drawImage(img, x, y, 35,35);
 		
 		var imgData = ctx.getImageData(x, y, 35, 35);

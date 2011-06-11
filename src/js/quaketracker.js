@@ -17,10 +17,39 @@ QuakeTracker = function(googleMap) {
 	this.map = googleMap;
 	this.infowindow = null;
 	this.markers = [];
-	this.feeds = {
-		'quakes7day25' : "http://www.earthquake.usgs.gov/eqcenter/catalogs/7day-M2.5.xml",
-		'quakes24hour25' : "http://www.earthquake.usgs.gov/eqcenter/catalogs/1day-M2.5.xml",
-		'quakes7day5' : "http://www.earthquake.usgs.gov/eqcenter/catalogs/7day-M5.xml"
+	this.feeds = {	
+		'quakes-1hr-M00' : {
+			description: 'M 0+ earthquakes (Past hour)',
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/1hour-M0.xml'
+		},
+		'quakes-1hr-M10' : {
+			description: 'M 1+ earthquakes (Past hour)',
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/1hour-M1.xml'
+		},
+		'quakes-1dy-M00' : {
+			description: 'M 0+ earthquakes (Past day)', 
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/1day-M0.xml'
+		},
+		'quakes-1dy-M10' : {
+			description: 'M 1+ earthquakes (Past day)',
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/1day-M1.xml'
+		},
+		'quakes-1dy-M25' : {
+			description: 'M 2.5+ earthquakes (Past day)', 
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/1day-M2.5.xml'
+		},
+		'quakes-1wk-M25' : {
+			description: 'M 2.5+ earthquakes (Past week)', 
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/7day-M2.5.xml'
+		},
+		'quakes-1wk-M50' : {
+			description: 'M 5+ earthquakes (Past week)', 
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/7day-M5.xml'
+		},
+		'quakes-1wk-M70' : {
+			description: 'M 7+ earthquakes (Past week)', 
+			atom: 'http://earthquake.usgs.gov/earthquakes/catalogs/7day-M7.xml'
+		}
 	};
 	this.quakes = {};
 };
@@ -40,15 +69,15 @@ QuakeTracker.prototype.loadQuakes = function(feed) {
 	},
 	success: function(xml){
 			/* TODO: do we need to bind this to elements now or can we cache?  Users won't even see 90% of these */
-						
+												
 			$(xml).find('entry').each(function(){
 				/* Retrieve all needed values from XML */
 				var entry = $(this);
 				var title = entry.find('title').text();							
 				var summary = entry.find('summary').text();
-				var htmlString = "<div class=\"infowindow\"><b>" + title + "</b>" + "<p>" + summary + "<br></div>";
-			
-				var coord = entry.find('point').eq(0).text().split(' ');	
+				var coordText = entry.find('point').eq(0).text();
+				var coord = coordText.split(' ');	
+				var age = entry.find('category[label="Age"]').attr('term');
 				var myLatlng = new google.maps.LatLng(parseFloat(coord[0]), parseFloat(coord[1]));
 				var marker = new google.maps.Marker({
 					 position: myLatlng,
@@ -62,6 +91,11 @@ QuakeTracker.prototype.loadQuakes = function(feed) {
 				  new google.maps.Point(0, 13));
 				  
 				marker.setIcon(icon);
+				
+				var htmlString = "<div class=\"infowindow\"><b>" + title + " (" + age + ")</b>" +
+								 "<p>" + summary + "</p>" + 
+								 "<div class=\"coords\">Lat/Long: [" + coordText + "]</div>" + 
+								 "</div>";
 				self.addMarker(marker, htmlString);			
 			});/*  end each */
 			$('#output').text("Showing " + self.markers.length + " earthquakes");
