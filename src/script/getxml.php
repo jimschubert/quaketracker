@@ -5,7 +5,7 @@
 	$q = strip_tags($_GET['q']);
 	header("Status: 200");
 	header("Content-type: text/xml");
-	echo  file_get_contents($q,0);   
+	echo  file_get_contents('http://'.$q);   
 	exit();
  }
  

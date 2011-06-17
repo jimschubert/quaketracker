@@ -62,7 +62,7 @@ QuakeTracker.prototype.loadQuakes = function(feed) {
  /* call ajax method to retrieve earthquakes */
   $.ajax({
 	type: "GET",
-	url: "script/getxml.php?q=" + feed, 
+	url: "script/getxml.php?q=" + feed.replace(/^http:\/\//g, ''), 
 	dataType: "xml",
 	error: function(e) {  
 		console.error(e.message);
